@@ -1,7 +1,7 @@
 import PyPDF2
 
 def extract_text_from_pdf(uploaded_file):
-    """Extracts text content from a medical PDF."""
+    """Safely extracts text from medical PDF reports."""
     try:
         pdf_reader = PyPDF2.PdfReader(uploaded_file)
         text = ""
