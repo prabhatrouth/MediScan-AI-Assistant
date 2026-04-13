@@ -38,7 +38,7 @@ col_left, col_right = st.columns([1, 1.5], gap="large")
 
 with col_left:
     st.markdown('<div class="welcome-section">', unsafe_allow_html=True)
-    st.markdown('<h1 class="header-text">Welcome, Prabhat! 👋</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="header-text">Welcome, User! 👋</h1>', unsafe_allow_html=True)
     st.write("---")
     st.info("""
     ### **MediScan AI Assistant**
