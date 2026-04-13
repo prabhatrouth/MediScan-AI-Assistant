@@ -52,8 +52,6 @@ with col_welcome:
     1. **Upload** your medical report (PDF).
     2. **Paste** text if you have digital notes.
     3. **Analyze** to get a jargon-free summary.
-    
-    *Built by Prabhat Kr Routh*
     """)
     st.image("https://cdn-icons-png.flaticon.com/512/3774/3774299.png", width=150)
     st.markdown('</div>', unsafe_allow_html=True)
