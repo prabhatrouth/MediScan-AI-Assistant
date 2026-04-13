@@ -22,7 +22,7 @@ MODEL_IDS = [
 ]
 
 # --- 2. Page Setup ---
-st.set_page_config(page_title="MediScan AI | Sanpra Consultancy", layout="wide", page_icon="🔬")
+st.set_page_config(page_title="MediScan AI Assistant", layout="wide", page_icon="🔬")
 
 st.markdown("""
     <style>
@@ -53,7 +53,7 @@ with col_welcome:
     2. **Paste** text if you have digital notes.
     3. **Analyze** to get a jargon-free summary.
     
-    *Built by Sanpra Consultancy Services*
+    *Built by Prabhat Kr Routh*
     """)
     st.image("https://cdn-icons-png.flaticon.com/512/3774/3774299.png", width=150)
     st.markdown('</div>', unsafe_allow_html=True)
