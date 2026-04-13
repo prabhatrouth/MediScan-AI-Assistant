@@ -3,103 +3,105 @@ import google.generativeai as genai
 from utils import extract_text_from_pdf
 
 # --- 1. API Configuration ---
-# Securely fetching the key from Streamlit Secrets
+# Your API Key is hardcoded for your convenience, 
+# but will check Streamlit Secrets first for security.
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 except:
-    # Local backup
     API_KEY = "AIzaSyBgfAPft_XrZqsDtSDAx5p6DcdEu1QO6f4"
 
 genai.configure(api_key=API_KEY)
 
-# --- 2. Page Setup ---
-st.set_page_config(page_title="MediScan AI Dashboard", layout="wide", page_icon="🔬")
+# Modern 2026 Model IDs
+# We try Gemini 3 first, then fallback to 2.5 if 3 is restricted.
+MODEL_IDS = [
+    "gemini-3-flash-preview", 
+    "gemini-3.1-flash-lite-preview",
+    "gemini-2.5-flash",
+    "gemini-1.5-flash-latest"
+]
 
-# Custom CSS for Professional Look
+# --- 2. Page Setup ---
+st.set_page_config(page_title="MediScan AI | Sanpra Consultancy", layout="wide", page_icon="🔬")
+
 st.markdown("""
     <style>
     .stApp { background-color: #f1f4f9; }
-    .main-card {
+    .welcome-card {
         background-color: #ffffff;
-        padding: 30px;
+        padding: 25px;
         border-radius: 15px;
         border-left: 10px solid #004aad;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
-    .header-style { color: #004aad; font-family: 'Arial'; font-weight: bold; }
+    .header-text { color: #004aad; font-family: 'Segoe UI'; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. UI Layout ---
-col_welcome, col_main = st.columns([1, 1.5], gap="large")
+# --- 3. Dashboard Layout ---
+col_welcome, col_analysis = st.columns([1, 1.5], gap="large")
 
 with col_welcome:
-    st.markdown('<div class="main-card">', unsafe_allow_html=True)
-    st.markdown('<h1 class="header-style">Welcome, Prabhat! 👋</h1>', unsafe_allow_html=True)
+    st.markdown('<div class="welcome-card">', unsafe_allow_html=True)
+    st.markdown('<h1 class="header-text">Welcome, Prabhat! 👋</h1>', unsafe_allow_html=True)
     st.write("---")
     st.markdown("""
-    ### **MediScan AI**
-    **Simplify Your Health Data**
+    ### **MediScan AI Assistant**
+    **Your health data, simplified.**
+    
     1. **Upload** your medical report (PDF).
-    2. **Paste** text if you have notes.
-    3. **Analyze** to get a clear summary.
+    2. **Paste** text if you have digital notes.
+    3. **Analyze** to get a jargon-free summary.
+    
+    *Built by Sanpra Consultancy Services*
     """)
     st.image("https://cdn-icons-png.flaticon.com/512/3774/3774299.png", width=150)
-    st.caption("Powered by Sanpra Consultancy Services")
     st.markdown('</div>', unsafe_allow_html=True)
 
-with col_main:
-    st.header("Report Analysis Engine")
+with col_analysis:
+    st.header("Medical Analysis Engine")
     
-    tab_pdf, tab_text = st.tabs(["📄 PDF Upload", "✍️ Manual Text"])
+    input_choice = st.radio("Select Input Method:", ["📄 Upload PDF", "✍️ Paste Text"], horizontal=True)
     
     report_content = ""
     
-    with tab_pdf:
-        uploaded_file = st.file_uploader("Upload Medical PDF", type=["pdf"])
+    if input_choice == "📄 Upload PDF":
+        uploaded_file = st.file_uploader("Upload Medical Report", type=["pdf"])
         if uploaded_file:
             report_content = extract_text_from_pdf(uploaded_file)
-            st.success("PDF Content Extracted!")
+            st.success("PDF Content Loaded Successfully!")
+    else:
+        report_content = st.text_area("Paste report text here:", height=250)
 
-    with tab_text:
-        text_area = st.text_area("Paste medical notes here:", height=200)
-        if text_area:
-            report_content = text_area
-
-    if st.button("Run AI Analysis 🔬"):
+    if st.button("Analyse Report 🔬"):
         if not report_content:
-            st.warning("Please provide a report to analyze.")
+            st.warning("Please provide a report for analysis.")
         else:
-            with st.spinner("Connecting to Gemini AI..."):
-                # LIST OF MODELS TO TRY (Fixes the 404 Error)
-                # We try the most likely stable aliases for 2026
-                models_to_try = [
-                    "gemini-3-flash-preview", 
-                    "gemini-3-flash", 
-                    "gemini-2.5-flash", 
-                    "gemini-1.5-flash"
-                ]
-                
-                analysis_success = False
-                
-                for model_id in models_to_try:
+            success = False
+            with st.spinner("Connecting to Gemini AI Engine..."):
+                for model_id in MODEL_IDS:
                     try:
                         model = genai.GenerativeModel(model_id)
                         prompt = f"""
-                        Interpret this medical report for a patient. 
-                        Use simple language. Explain key values and suggest 
-                        3 questions for their doctor. 
-                        Data: {report_content}
+                        Acting as a professional medical interpreter, analyze this report:
+                        {report_content}
+                        
+                        Provide:
+                        1. A 2-sentence summary.
+                        2. A list of key values that seem abnormal.
+                        3. Simplified definitions of medical terms used.
+                        4. Three questions to ask the doctor.
+                        
+                        Include a disclaimer that this is not a diagnosis.
                         """
                         response = model.generate_content(prompt)
                         
                         st.markdown(f"### 📋 Analysis Results (via {model_id})")
                         st.markdown(response.text)
-                        st.info("**Disclaimer:** This is an AI interpretation and not a diagnosis.")
-                        analysis_success = True
-                        break # Exit loop if a model works
+                        success = True
+                        break # Stop loop if successful
                     except Exception:
-                        continue # Try the next model if 404 or error
+                        continue # Try next model if 404 occurs
                 
-                if not analysis_success:
-                    st.error("Connection Error: All Gemini models returned a 404 or busy status. Please check your API key permissions in Google AI Studio.")
+                if not success:
+                    st.error("Connection Error: All models returned a 404. Check your API key permissions in AI Studio.")
