@@ -43,7 +43,7 @@ col_welcome, col_analysis = st.columns([1, 1.5], gap="large")
 
 with col_welcome:
     st.markdown('<div class="welcome-card">', unsafe_allow_html=True)
-    st.markdown('<h1 class="header-text">Welcome, Prabhat! 👋</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="header-text">Welcome, User! 👋</h1>', unsafe_allow_html=True)
     st.write("---")
     st.markdown("""
     ### **MediScan AI Assistant**
